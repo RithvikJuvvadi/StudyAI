@@ -219,7 +219,7 @@ def generate_questions_with_groq(text, filename):
     for i, chunk in enumerate(chunks):
         print(f"Processing chunk {i + 1}/{len(chunks)}...")
         
-        prompt = f"""Extract important questions and answers from this document content.
+        prompt = f"""Extract important questions from this document content and GENERATE comprehensive answers based on the document.
 
 CRITICAL INSTRUCTIONS - READ CAREFULLY:
 1. Extract COMPLETE questions with ALL parts:
@@ -238,11 +238,21 @@ CRITICAL INSTRUCTIONS - READ CAREFULLY:
 
 3. NEVER truncate or cut off questions. If a question has options, include ALL of them.
 
-4. Focus on finding actual questions in the text along with their answers and ALL options.
+4. GENERATE ANSWERS: For each question, you MUST generate a comprehensive answer based on the document content:
+   - For multiple choice questions: Provide the correct option letter (A, B, C, D, etc.) AND a brief explanation of why it's correct
+   - For open-ended questions: Generate a detailed answer based on the information in the document
+   - For fill-in-the-blank questions: Provide the missing word/phrase and explain it
+   - Answers should be accurate, detailed, and based solely on the document content provided
+   - If the document doesn't contain enough information, infer a reasonable answer based on the context
+
+5. Answer format examples:
+   - Multiple choice: "C. [Explanation of why C is correct based on document]"
+   - Open-ended: "[Detailed answer explaining the concept based on document content]"
+   - Fill-in-the-blank: "[Missing word/phrase]. [Explanation]"
 
 Return a JSON array of objects with these fields:
 - question: string (COMPLETE question with ALL options if present - this is critical!)
-- answer: string (the correct answer letter/option or "Answer not provided" if not found)
+- answer: string (GENERATED comprehensive answer based on document content - NEVER use "Answer not provided")
 - importance: "high" | "medium" | "low"
 - topic: string
 - difficulty: "easy" | "medium" | "hard"
@@ -265,7 +275,7 @@ Document content:
                     'messages': [
                     {
                         'role': 'system',
-                        'content': 'You are an expert at extracting COMPLETE educational questions from documents. CRITICAL: Always include the FULL question text with ALL multiple choice options (A, B, C, D, etc.), complete sentences, and all parts of the question. Never truncate or cut off questions. Return only valid JSON arrays.'
+                        'content': 'You are an expert at extracting COMPLETE educational questions from documents and GENERATING comprehensive answers. CRITICAL: (1) Always include the FULL question text with ALL multiple choice options (A, B, C, D, etc.), complete sentences, and all parts of the question. Never truncate or cut off questions. (2) ALWAYS generate detailed answers based on the document content - never return "Answer not provided". For multiple choice questions, provide the correct option and explanation. For open-ended questions, provide comprehensive answers based on the document. Return only valid JSON arrays.'
                     },
                         {
                             'role': 'user',
@@ -347,7 +357,10 @@ Document content:
             # Normalize questions
             for q_idx, q in enumerate(questions):
                 question_text = str(q.get('question', q.get('Question', ''))).strip()
-                answer_text = str(q.get('answer', q.get('Answer', q.get('solution', 'Answer not provided')))).strip()
+                answer_text = str(q.get('answer', q.get('Answer', q.get('solution', '')))).strip()
+                # If answer is empty or says "not provided", generate a placeholder
+                if not answer_text or 'not provided' in answer_text.lower() or 'answer not' in answer_text.lower():
+                    answer_text = 'Answer will be generated based on document content.'
                 
                 # Check if question seems incomplete
                 if question_text:

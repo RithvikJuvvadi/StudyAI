@@ -280,8 +280,11 @@ export default function ExamPrep() {
         content += `Importance: ${q.importance.toUpperCase()}\n`;
         content += `Confidence: ${(q.confidence * 100).toFixed(0)}%\n\n`;
         
-        if (q.answer && q.answer !== 'Answer not provided') {
+        // Always include answer in download
+        if (q.answer && q.answer.trim()) {
           content += `Answer: ${q.answer}\n`;
+        } else {
+          content += `Answer: [Answer not available]\n`;
         }
         
         content += '\n' + '-'.repeat(50) + '\n\n';
@@ -528,8 +531,14 @@ export default function ExamPrep() {
                               {question.difficulty.toUpperCase()}
                             </Badge>
                           </div>
-                          <p className="text-sm font-medium mb-1">{question.question}</p>
-                          <div className="text-xs text-muted-foreground">
+                          <p className="text-sm font-medium mb-2">{question.question}</p>
+                          {question.answer && question.answer.trim() && !question.answer.toLowerCase().includes('answer not provided') && (
+                            <div className="mt-2 p-2 bg-muted rounded-md">
+                              <p className="text-xs font-semibold text-foreground mb-1">Answer:</p>
+                              <p className="text-xs text-foreground whitespace-pre-wrap">{question.answer}</p>
+                            </div>
+                          )}
+                          <div className="text-xs text-muted-foreground mt-2">
                             <span>{(question.confidence * 100).toFixed(0)}% confidence</span>
                           </div>
                         </div>
