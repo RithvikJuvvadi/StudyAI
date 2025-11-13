@@ -3,10 +3,10 @@ import { Button } from "@/components/ui/button";
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
 import { Badge } from "@/components/ui/badge";
 import { FileText, BookOpen, Zap, CheckCircle, ArrowRight } from "lucide-react";
-import { useAuth } from "@/contexts/AuthContext";
+import { useAuth } from "@clerk/clerk-react";
 
 export default function Index() {
-  const { isAuthenticated } = useAuth();
+  const { isSignedIn } = useAuth();
   
   return (
     <div className="min-h-screen bg-gradient-to-br from-blue-50 via-white to-green-50">
@@ -30,7 +30,7 @@ export default function Index() {
           </p>
 
           <div className="flex flex-col sm:flex-row gap-4 justify-center items-center mt-8">
-            {isAuthenticated ? (
+            {isSignedIn ? (
               <>
                 <Link to="/word-editor">
                   <Button size="lg" className="min-w-[200px]">
@@ -46,17 +46,9 @@ export default function Index() {
               </>
             ) : (
               <>
-                <Link to="/signup">
-                  <Button size="lg" className="min-w-[200px]">
-                    Get Started Free
-                    <ArrowRight className="ml-2 h-4 w-4" />
-                  </Button>
-                </Link>
-                <Link to="/login">
-                  <Button variant="outline" size="lg" className="min-w-[200px]">
-                    Sign In
-                  </Button>
-                </Link>
+                <p className="text-sm text-muted-foreground">
+                  Sign in or sign up using the buttons in the navigation bar to get started.
+                </p>
               </>
             )}
           </div>
@@ -105,7 +97,7 @@ export default function Index() {
                   <span>Export to .docx or .pdf</span>
                 </li>
               </ul>
-              {isAuthenticated ? (
+              {isSignedIn ? (
                 <Link to="/word-editor" className="block">
                   <Button className="w-full mt-6" size="lg">
                     Start Editing
@@ -113,12 +105,9 @@ export default function Index() {
                   </Button>
                 </Link>
               ) : (
-                <Link to="/login" className="block">
-                  <Button className="w-full mt-6" size="lg">
-                    Sign In to Access
-                    <ArrowRight className="ml-2 h-4 w-4" />
-                  </Button>
-                </Link>
+                <p className="text-sm text-muted-foreground text-center mt-6">
+                  Sign in to access this feature
+                </p>
               )}
             </CardContent>
           </Card>
@@ -153,7 +142,7 @@ export default function Index() {
                   <span>Download as formatted PDF</span>
                 </li>
               </ul>
-              {isAuthenticated ? (
+              {isSignedIn ? (
                 <Link to="/exam-prep" className="block">
                   <Button variant="secondary" className="w-full mt-6" size="lg">
                     Start Preparing
@@ -161,12 +150,9 @@ export default function Index() {
                   </Button>
                 </Link>
               ) : (
-                <Link to="/login" className="block">
-                  <Button variant="secondary" className="w-full mt-6" size="lg">
-                    Sign In to Access
-                    <ArrowRight className="ml-2 h-4 w-4" />
-                  </Button>
-                </Link>
+                <p className="text-sm text-muted-foreground text-center mt-6">
+                  Sign in to access this feature
+                </p>
               )}
             </CardContent>
           </Card>

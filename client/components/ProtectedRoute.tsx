@@ -1,6 +1,6 @@
 import React from 'react';
-import { Navigate, useLocation } from 'react-router-dom';
-import { useAuth } from '@/contexts/AuthContext';
+import { Navigate } from 'react-router-dom';
+import { useAuth } from '@clerk/clerk-react';
 import { Loader2 } from 'lucide-react';
 
 interface ProtectedRouteProps {
@@ -8,10 +8,9 @@ interface ProtectedRouteProps {
 }
 
 export const ProtectedRoute: React.FC<ProtectedRouteProps> = ({ children }) => {
-  const { isAuthenticated, loading } = useAuth();
-  const location = useLocation();
+  const { isSignedIn, isLoaded } = useAuth();
 
-  if (loading) {
+  if (!isLoaded) {
     return (
       <div className="min-h-screen flex items-center justify-center">
         <div className="flex items-center space-x-2">
@@ -22,9 +21,9 @@ export const ProtectedRoute: React.FC<ProtectedRouteProps> = ({ children }) => {
     );
   }
 
-  if (!isAuthenticated) {
-    // Redirect to login page with the current location as the return URL
-    return <Navigate to="/login" state={{ from: location }} replace />;
+  if (!isSignedIn) {
+    // Redirect to home page where they can sign in
+    return <Navigate to="/" replace />;
   }
 
   return <>{children}</>;
